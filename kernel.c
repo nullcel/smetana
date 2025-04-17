@@ -7,6 +7,7 @@
 #include "io_ports.h"
 #include "filesystem.h"
 #include "utils.h"
+#include "info.h"
 
 // Multiboot header constants
 #define MULTIBOOT_HEADER_MAGIC 0x1BADB002
@@ -46,7 +47,7 @@ void _start(void) {
 void kmain() {
     // Print a message to the screen
     char *video_memory = (char *)0xB8000;
-    const char *message = "Smetana OS started";
+    const char *message = "%s started\n ", OS_FULL_NAME;
 
     for (int i = 0; message[i] != '\0'; i++) {
         video_memory[i * 2] = message[i];

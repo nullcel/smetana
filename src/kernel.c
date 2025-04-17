@@ -7,6 +7,7 @@
 #include "io_ports.h"
 #include "filesystem.h"
 #include "utils.h"
+#include "info.h"  // Add this include for OS_FULL_NAME
 
 // Declare external liner function
 extern int liner(void);
@@ -21,7 +22,7 @@ extern uint8 g_fore_color, g_back_color;
 static void get_current_path(char* path_buffer, uint32 size) {
     char temp[MAX_PATH];
     FileNode* node = fs_get_current_dir();
-    int path_len = 0;
+    uint32 path_len = 0;  // Change to uint32 to match size type
 
     // Handle root directory
     if (node == fs_path_to_node("/")) {
@@ -31,7 +32,7 @@ static void get_current_path(char* path_buffer, uint32 size) {
 
     // Build path from current directory up to root
     while (node != fs_path_to_node("/")) {
-        int name_len = strlen(node->name);
+        uint32 name_len = strlen(node->name);  // Change to uint32
         if (path_len + name_len + 1 >= size) break;
         
         // Shift existing path right
@@ -179,7 +180,7 @@ void kmain() {
         } else if(strcmp(command, "liner") == 0) {
             liner();
         } else if(strcmp(command, "help") == 0) {
-            printf("NIS Smetana Interactive Shell\n");
+            printf("SIS Smetana Interactive Shell\n");
             printf("These shell commands are defined internally. Type `help' to see this list.\n");
             printf("Type `help name' to find out more about the function `name'.\n");
             printf("Use `info bash' to find out more about the shell in general.\n");
@@ -187,14 +188,15 @@ void kmain() {
             printf(" cpuid           - Display CPU information\n");
             printf(" echo <text>     - Display a line of text\n");
             printf(" clear           - Clear the Smetana screen\n");
-            printf(" ls             - List directory contents\n");
-            printf(" cd <dir>       - Change the current directory\n");
-            printf(" pwd            - Print working directory\n");
-            printf(" mkdir <dir>    - Create a new directory\n");
-            printf(" color          - Show available colors\n");
+            printf(" ls              - List directory contents\n");
+            printf(" cd <dir>        - Change the current directory\n");
+            printf(" pwd             - Print working directory\n");
+            printf(" mkdir <dir>     - Create a new directory\n");
+            printf(" color           - Show available colors\n");
             printf(" color <fg> <bg> - Set text color (e.g. color RED BLACK)\n");
-            printf(" reset-color    - Reset text color to default\n");
-            printf(" shutdown       - Shutdown the system\n");
+            printf(" reset-color     - Reset text color to default\n");
+            printf(" shutdown        - Shutdown the system\n");
+            printf(" uname           - Display system information\n");
         } else if(strcmp(command, "clear") == 0) {
             console_clear(g_fore_color, g_back_color);
         } else if(strcmp(command, "ls") == 0) {
@@ -279,6 +281,8 @@ void kmain() {
             reset_text_color();
         } else if(strcmp(command, "shutdown") == 0) {
             shutdown();
+        } else if(strcmp(command, "uname") == 0) {
+            printf("%s\n", OS_FULL_NAME);
         } else {
             printf("NIS: %s: command not found\n", command);
         }
