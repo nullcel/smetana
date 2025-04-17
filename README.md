@@ -14,7 +14,7 @@
 ### Compile
 
 ```
-	$ make
+$ make
 ```
 
 ### run
@@ -22,7 +22,7 @@
 ```
 	$ qemu-system-x86_64 out/Pelmen.iso
 ```
-or
+or use i386
 ```
 	$ qemu-system-i386 out/Pelmen.iso
 ```
