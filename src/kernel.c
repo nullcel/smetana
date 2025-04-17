@@ -132,7 +132,7 @@ void kmain() {
         
         set_text_color(COLOR_BRIGHT_GREEN, COLOR_BLACK);
         printf("tty1@");
-        printf("Smetana");
+        printf("smetana");
         
         set_text_color(COLOR_WHITE, COLOR_BLACK);
         printf(":");
@@ -145,7 +145,7 @@ void kmain() {
         printf("$ ");
         
         // Calculate total prompt length for input bound
-        strcpy(prompt, "tty1@Smetana:");
+        strcpy(prompt, "tty1@smetana:");
         strcat(prompt, current_path);
         strcat(prompt, "$ ");
 
