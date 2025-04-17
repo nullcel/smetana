@@ -46,7 +46,7 @@ void _start(void) {
 void kmain() {
     // Print a message to the screen
     char *video_memory = (char *)0xB8000;
-    const char *message = "Pelmen OS started";
+    const char *message = "Smetana OS started";
 
     for (int i = 0; message[i] != '\0'; i++) {
         video_memory[i * 2] = message[i];

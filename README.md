@@ -20,9 +20,9 @@
 ### run
 
 ```
-	$ qemu-system-x86_64 out/Pelmen.iso
+	$ qemu-system-x86_64 out/Smetana.iso
 ```
 or
 ```
-	$ qemu-system-i386 out/Pelmen.iso
+	$ qemu-system-i386 out/Smetana.iso
 ```

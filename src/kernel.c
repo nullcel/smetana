@@ -108,7 +108,7 @@ void kmain() {
     char buffer[255];
     char command[32];
     char args[223];
-    char prompt[MAX_PATH + 32];  // Extra space for "user@Pelmen:" and "$"
+    char prompt[MAX_PATH + 32];  // Extra space for "user@Smetana:" and "$"
     char current_path[MAX_PATH];
 
     gdt_init();
@@ -117,7 +117,7 @@ void kmain() {
     keyboard_init();
     fs_init();  // Initialize filesystem
 
-    announce("Pelmen Interactive Shell initialized\n");
+    announce("Smetana Interactive Shell initialized\n");
     delay(2);
     announce("Teletype /dev/tty1 initialized\n");
     announce("Filesystem initialized\n");
@@ -132,7 +132,7 @@ void kmain() {
         
         set_text_color(COLOR_BRIGHT_GREEN, COLOR_BLACK);
         printf("tty1@");
-        printf("pelmen");
+        printf("Smetana");
         
         set_text_color(COLOR_WHITE, COLOR_BLACK);
         printf(":");
@@ -145,7 +145,7 @@ void kmain() {
         printf("$ ");
         
         // Calculate total prompt length for input bound
-        strcpy(prompt, "tty1@pelmen:");
+        strcpy(prompt, "tty1@Smetana:");
         strcat(prompt, current_path);
         strcat(prompt, "$ ");
 
@@ -179,14 +179,14 @@ void kmain() {
         } else if(strcmp(command, "liner") == 0) {
             liner();
         } else if(strcmp(command, "help") == 0) {
-            printf("NIS Pelmen Interactive Shell\n");
+            printf("NIS Smetana Interactive Shell\n");
             printf("These shell commands are defined internally. Type `help' to see this list.\n");
             printf("Type `help name' to find out more about the function `name'.\n");
             printf("Use `info bash' to find out more about the shell in general.\n");
             printf("\n");
             printf(" cpuid           - Display CPU information\n");
             printf(" echo <text>     - Display a line of text\n");
-            printf(" clear           - Clear the Pelmen screen\n");
+            printf(" clear           - Clear the Smetana screen\n");
             printf(" ls             - List directory contents\n");
             printf(" cd <dir>       - Change the current directory\n");
             printf(" pwd            - Print working directory\n");
