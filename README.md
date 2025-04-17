@@ -1,4 +1,4 @@
-# >
+# Smetana
 
 ## Requirements
 
