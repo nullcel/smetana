@@ -14,15 +14,15 @@
 ### Compile
 
 ```
-	$ make
+$ make
 ```
 
-### run
+### Run
 
 ```
 	$ qemu-system-x86_64 out/Smetana.iso
 ```
-or
+or use i386
 ```
 	$ qemu-system-i386 out/Smetana.iso
 ```
