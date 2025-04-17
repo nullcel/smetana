@@ -17,7 +17,7 @@
 $ make
 ```
 
-### run
+### Run
 
 ```
 	$ qemu-system-x86_64 out/Pelmen.iso
