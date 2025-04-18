@@ -7,10 +7,10 @@
 #include "io_ports.h"
 #include "filesystem.h"
 #include "utils.h"
-#include "info.h"  // Add this include for OS_FULL_NAME
+#include "info.h"
 
 // Update the external declaration to match the correct function name
-extern void draw_wave_animation(void);
+extern void draw_wave(void);
 
 #define BRAND_QEMU  1
 #define BRAND_VBOX  2
@@ -177,8 +177,6 @@ void kmain() {
 
         if(strcmp(command, "cpuid") == 0) {
             cpuid_info(1);
-        } else if(strcmp(command, "waver") == 0) {
-            draw_wave();
         } else if(strcmp(command, "help") == 0) {
             printf("SIS Smetana Interactive Shell\n");
             printf("These shell commands are defined internally. Type `help' to see this list.\n");
@@ -195,7 +193,7 @@ void kmain() {
             printf(" color           - Show available colors\n");
             printf(" color <fg> <bg> - Set text color (e.g. color RED BLACK)\n");
             printf(" reset-color     - Reset text color to default\n");
-            printf(" shutdown        - Shutdown the system\n");
+            printf(" shutdown/exit   - Shutdown the system\n");
             printf(" uname           - Display system information\n");
         } else if(strcmp(command, "clear") == 0) {
             console_clear(g_fore_color, g_back_color);
@@ -215,6 +213,8 @@ void kmain() {
             }
         } else if(strcmp(command, "echo") == 0) {
             printf("%s\n", args);
+        } else if(strcmp(command, "waver") == 0) {
+            draw_wave();
         } else if(strcmp(command, "color") == 0) {
             print_available_colors();
         } else if(strncmp(command, "color ", 6) == 0) {
@@ -222,16 +222,15 @@ void kmain() {
             int pos = 6;
             int i = 0;
             
-            // Parse foreground color
+            // Foregroun
             while(buffer[pos] && buffer[pos] != ' ' && i < 19) {
                 fg[i++] = buffer[pos++];
             }
             fg[i] = '\0';
             
-            // Skip spaces
             while(buffer[pos] == ' ') pos++;
             
-            // Parse background color
+            // Background
             i = 0;
             while(buffer[pos] && buffer[pos] != ' ' && i < 19) {
                 bg[i++] = buffer[pos++];
@@ -279,12 +278,14 @@ void kmain() {
             set_text_color(fore_color, back_color);
         } else if(strcmp(command, "reset-color") == 0) {
             reset_text_color();
-        } else if(strcmp(command, "shutdown") == 0) {
+        } else if (strcmp(command, "shutdown") == 0 || strcmp(command, "exit") == 0) {
+            announce("Shutting down. Bye!\n");
+            delay(15);
             shutdown();
         } else if(strcmp(command, "uname") == 0) {
             printf("%s\n", OS_FULL_NAME);
         } else {
-            printf("NIS: %s: command not found\n", command);
+            printf("from regular: %s: command not found\n", command);
         }
     }
 }
