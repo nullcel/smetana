@@ -51,6 +51,16 @@ void vga_disable_cursor() {
 }
 
 void vga_set_graphics_mode(void) {
+
+    asm volatile (
+        "mov $0x13, %%al\n"
+        "mov $0x00, %%ah\n"
+        "int $0x10"
+        :
+        :
+        : "ax"
+    );
+
     // Set VGA mode 13h (320x200, 256 colors)
     outportb(0x3C2, 0x63);
     
