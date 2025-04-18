@@ -9,8 +9,8 @@
 #include "utils.h"
 #include "info.h"  // Add this include for OS_FULL_NAME
 
-// Declare external liner function
-extern int liner(void);
+// Update the external declaration to match the correct function name
+extern void draw_wave_animation(void);
 
 #define BRAND_QEMU  1
 #define BRAND_VBOX  2
@@ -177,8 +177,8 @@ void kmain() {
 
         if(strcmp(command, "cpuid") == 0) {
             cpuid_info(1);
-        } else if(strcmp(command, "liner") == 0) {
-            liner();
+        } else if(strcmp(command, "waver") == 0) {
+            draw_wave();
         } else if(strcmp(command, "help") == 0) {
             printf("SIS Smetana Interactive Shell\n");
             printf("These shell commands are defined internally. Type `help' to see this list.\n");

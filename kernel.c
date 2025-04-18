@@ -28,6 +28,7 @@ const struct {
 
 // Entry point for the kernel
 extern void kmain(void);  // Declaration of kmain
+extern int wave(void);
 
 void _start(void) {
     // Initialize essential kernel subsystems first

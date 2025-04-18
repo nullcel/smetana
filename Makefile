@@ -8,6 +8,7 @@ LD = /usr/bin/ld
 GRUB = /usr/bin/grub-mkrescue
 # sources
 SRC = src
+PROGRAMS = programs
 ASM_SRC = $(SRC)/asm
 # objects
 OBJ = obj
@@ -41,7 +42,7 @@ OBJECTS=$(ASM_OBJ)/entry.o $(ASM_OBJ)/load_gdt.o\
 		$(OBJ)/string.o $(OBJ)/console.o\
 		$(OBJ)/gdt.o $(OBJ)/idt.o $(OBJ)/isr.o $(OBJ)/8259_pic.o\
 		$(OBJ)/keyboard.o $(OBJ)/filesystem.o $(OBJ)/utils.o\
-		$(OBJ)/liner.o $(OBJ)/kernel.o
+		$(OBJ)/waver.o $(OBJ)/kernel.o
 
 
 all: $(OBJECTS)
@@ -136,9 +137,9 @@ $(OBJ)/utils.o : $(SRC)/utils.c
 	$(CC) $(CC_FLAGS) -c $(SRC)/utils.c -o $(OBJ)/utils.o
 	@printf "\n"
 
-$(OBJ)/liner.o : $(SRC)/liner.c
-	@printf "[ $(SRC)/liner.c ]\n"
-	$(CC) $(CC_FLAGS) -c $(SRC)/liner.c -o $(OBJ)/liner.o
+$(OBJ)/waver.o : $(SRC)/$(PROGRAMS)/waver.c
+	@printf "[ $(SRC)/$(PROGRAMS)/waver.c ]\n"
+	$(CC) $(CC_FLAGS) -c $(SRC)/$(PROGRAMS)/waver.c -o $(OBJ)/waver.o
 	@printf "\n"
 
 $(OBJ)/kernel.o : $(SRC)/kernel.c

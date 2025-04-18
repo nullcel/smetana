@@ -162,5 +162,12 @@ char kb_scan(void) {
     return inportb(KEYBOARD_DATA_PORT);
 }
 
+// Non-blocking character read
+char keyboard_read() {
+    char c = g_ch;
+    g_ch = 0;
+    return c;
+}
+
 
 
