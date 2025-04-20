@@ -50,6 +50,15 @@ void vga_disable_cursor() {
     outportb(0x3D5, 32);
 }
 
+void vga_set_graphics_mode() {
+    asm volatile ("mov $0x13, %al\nint $0x10");
+}
+
+void vga_set_text_mode() {
+    asm volatile ("mov $0x03, %al\nint $0x10");
+}
+
+/*
 void vga_set_graphics_mode(void) {
 
     asm volatile (
@@ -113,8 +122,8 @@ void vga_set_graphics_mode(void) {
     for(int i = 0; i < VGA_GRAPHICS_WIDTH * VGA_GRAPHICS_HEIGHT; i++) {
         vga[i] = 0;  // Set to black
     }
-}
-
+}*/
+/*
 void vga_set_text_mode(void) {
     // Return to text mode 03h (80x25 text)
     outportb(0x3C2, 0x67);  // Miscellaneous output 
@@ -168,7 +177,7 @@ void vga_set_text_mode(void) {
     outportb(0x3C0, 0x20);  // Re-enable video display
 
     // Don't clear the text buffer - let the existing content show
-}
+}*/
 
 void vga_draw_pixel(uint16 x, uint16 y, uint8 color) {
     if (x >= VGA_GRAPHICS_WIDTH || y >= VGA_GRAPHICS_HEIGHT) return;
