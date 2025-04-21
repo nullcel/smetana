@@ -11,48 +11,40 @@ void fs_init(void) {
 }
 
 FileNode* fs_create_node(const char* name, BOOL is_directory) {
+    if (!name) return NULL;
+
     FileNode* node = (FileNode*)malloc(sizeof(FileNode));
     if (!node) return NULL;
 
-    strncpy(node->name, name, MAX_FILENAME);
+    strncpy(node->name, name, MAX_FILENAME - 1);
+    node->name[MAX_FILENAME - 1] = '\0'; // nulltermination
     node->size = 0;
     node->is_directory = is_directory;
     node->parent = NULL;
     node->child_count = 0;
     memset(node->children, 0, sizeof(node->children));
-    
+
     return node;
 }
 
 BOOL fs_mkdir(const char* path) {
-    if (!path || strlen(path) == 0) return FALSE;
-    
-    FileNode* parent = current_dir;
+    if (!path || !*path) return FALSE;
+
+    if (current_dir->child_count >= MAX_FILES) return FALSE;
+
     FileNode* new_dir = fs_create_node(path, TRUE);
     if (!new_dir) return FALSE;
 
-    new_dir->parent = parent;
-    if (parent->child_count >= MAX_FILES) {
-        // Free the node if we can't add it
-        free(new_dir);
-        return FALSE;
-    }
-
-    parent->children[parent->child_count++] = new_dir;
+    new_dir->parent = current_dir;
+    current_dir->children[current_dir->child_count++] = new_dir;
     return TRUE;
 }
 
 FileNode* fs_cd(const char* path) {
-    if (!path) return current_dir;
-    
-    if (strcmp(path, ".") == 0) {
-        return current_dir;
-    }
-    
+    if (!path || strcmp(path, ".") == 0) return current_dir;
+
     if (strcmp(path, "..") == 0) {
-        if (current_dir->parent) {
-            current_dir = current_dir->parent;
-        }
+        if (current_dir->parent) current_dir = current_dir->parent;
         return current_dir;
     }
 
@@ -61,18 +53,15 @@ FileNode* fs_cd(const char* path) {
         return current_dir;
     }
 
-    // Look for directory in current directory
     for (uint32 i = 0; i < current_dir->child_count; i++) {
-        if (strcmp(current_dir->children[i]->name, path) == 0) {
-            if (current_dir->children[i]->is_directory) {
-                current_dir = current_dir->children[i];
-                return current_dir;
-            }
-            return NULL; // Found but not a directory
+        FileNode* child = current_dir->children[i];
+        if (strcmp(child->name, path) == 0 && child->is_directory) {
+            current_dir = child;
+            return current_dir;
         }
     }
-    
-    return NULL; // Not found
+
+    return NULL;
 }
 
 void fs_ls(const char* path) {
@@ -84,11 +73,7 @@ void fs_ls(const char* path) {
 
     for (uint32 i = 0; i < dir->child_count; i++) {
         FileNode* node = dir->children[i];
-        if (node->is_directory) {
-            printf("[DIR]  %s\n", node->name);
-        } else {
-            printf("       %s\n", node->name);
-        }
+        printf("%s  %s\n", node->is_directory ? "[DIR]" : "     ", node->name);
     }
 }
 
@@ -97,60 +82,50 @@ FileNode* fs_get_current_dir(void) {
 }
 
 void fs_print_working_directory(void) {
-    char path[MAX_PATH];
-    FileNode* node = current_dir;
-    int path_len = 0;
-
-    // Handle root directory
-    if (node == root_node) {
+    if (current_dir == root_node) {
         printf("/\n");
         return;
     }
 
-    // Build path from current directory up to root
+    char path[MAX_PATH] = {0};
+    int path_len = 0;
+    FileNode* node = current_dir;
+
     while (node != root_node) {
         int name_len = strlen(node->name);
         if (path_len + name_len + 1 >= MAX_PATH) break;
-        
-        // Shift existing path right
+
         memmove(path + name_len + 1, path, path_len);
-        // Add new directory name
         memcpy(path, node->name, name_len);
         path[name_len] = '/';
         path_len += name_len + 1;
-        
+
         node = node->parent;
     }
 
-    // Add null terminator
     path[path_len] = '\0';
     printf("/%s\n", path);
 }
 
 FileNode* fs_path_to_node(const char* path) {
-    if (!path || strlen(path) == 0) return current_dir;
-    
+    if (!path || !*path) return current_dir;
     if (strcmp(path, "/") == 0) return root_node;
-    
-    // Start from current directory
+
     FileNode* current = current_dir;
     char path_copy[MAX_PATH];
-    strncpy(path_copy, path, MAX_PATH);
-    
+    strncpy(path_copy, path, MAX_PATH - 1);
+    path_copy[MAX_PATH - 1] = '\0';
+
     char* token = strtok(path_copy, "/");
     while (token) {
-        if (strcmp(token, ".") == 0) {
-            // Stay in current directory
-        } else if (strcmp(token, "..") == 0) {
-            if (current->parent) {
-                current = current->parent;
-            }
-        } else {
-            // Look for directory in current directory
+        if (strcmp(token, "..") == 0) {
+            if (current->parent) current = current->parent;
+        } else if (strcmp(token, ".") != 0) {
             BOOL found = FALSE;
             for (uint32 i = 0; i < current->child_count; i++) {
-                if (strcmp(current->children[i]->name, token) == 0) {
-                    current = current->children[i];
+                FileNode* child = current->children[i];
+                if (strcmp(child->name, token) == 0) {
+                    current = child;
                     found = TRUE;
                     break;
                 }
@@ -159,6 +134,6 @@ FileNode* fs_path_to_node(const char* path) {
         }
         token = strtok(NULL, "/");
     }
-    
+
     return current;
 }
