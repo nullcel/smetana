@@ -48,7 +48,7 @@ void _start(void) {
 void kmain() {
     // Print a message to the screen
     char *video_memory = (char *)0xB8000;
-    const char *message = "%s started\n ", OS_FULL_NAME;
+    const char *message = "SmetanaOS started\n ";
 
     for (int i = 0; message[i] != '\0'; i++) {
         video_memory[i * 2] = message[i];
@@ -56,7 +56,5 @@ void kmain() {
     }
 
     // Halt the system
-    while (1) {
-        __asm__("hlt");
-    }
+    for (;;) asm volatile("hlt");
 }
