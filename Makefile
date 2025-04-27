@@ -16,36 +16,38 @@ ASM_OBJ = $(OBJ)/asm
 CONFIG = ./config
 OUT = out
 INC = ./include
-INCLUDE=-I$(INC)
+INCLUDE = -I$(INC)
 
-MKDIR= mkdir -p
+MKDIR = mkdir -p
 CP = cp -f
-DEFINES=
+DEFINES =
 
 # assembler flags
 ASM_FLAGS = -f elf32
 # compiler flags
 CC_FLAGS = $(INCLUDE) $(DEFINES) -m32 -std=gnu99 -ffreestanding -Wall -Wextra
-# linker flags, for linker add linker.ld file too
+# linker flags
 LD_FLAGS = -m elf_i386 -T $(CONFIG)/linker.ld -nostdlib
 
 # target file to create in linking
-TARGET=$(OUT)/Smetana.bin
+TARGET = $(OUT)/Smetana.bin
 
 # iso file target to create
-TARGET_ISO=$(OUT)/Smetana.iso
-ISO_DIR=$(OUT)/isodir
+TARGET_ISO = $(OUT)/Smetana.iso
+ISO_DIR = $(OUT)/isodir
 
-OBJECTS=$(ASM_OBJ)/entry.o $(ASM_OBJ)/load_gdt.o\
-		$(ASM_OBJ)/load_idt.o $(ASM_OBJ)/exception.o $(ASM_OBJ)/irq.o\
-		$(OBJ)/io_ports.o $(OBJ)/vga.o\
-		$(OBJ)/string.o $(OBJ)/console.o\
-		$(OBJ)/gdt.o $(OBJ)/idt.o $(OBJ)/isr.o $(OBJ)/8259_pic.o\
-		$(OBJ)/keyboard.o $(OBJ)/filesystem.o $(OBJ)/utils.o\
-		$(OBJ)/waver.o $(OBJ)/kernel.o
+OBJECTS = $(ASM_OBJ)/entry.o $(ASM_OBJ)/load_gdt.o \
+          $(ASM_OBJ)/load_idt.o $(ASM_OBJ)/exception.o $(ASM_OBJ)/irq.o \
+          $(OBJ)/io_ports.o $(OBJ)/vga.o \
+          $(OBJ)/string.o $(OBJ)/console.o \
+          $(OBJ)/gdt.o $(OBJ)/idt.o $(OBJ)/isr.o $(OBJ)/8259_pic.o \
+          $(OBJ)/keyboard.o $(OBJ)/filesystem.o $(OBJ)/utils.o \
+          $(OBJ)/waver.o $(OBJ)/kernel.o
 
-
-all: $(OBJECTS)
+all: 
+	@$(MKDIR) $(OBJ) $(ASM_OBJ) $(OUT)
+	@printf "[ assembling and compiling... ]\n"
+	make $(OBJECTS)
 	@printf "[ linking... ]\n"
 	$(LD) $(LD_FLAGS) -o $(TARGET) $(OBJECTS)
 	grub-file --is-x86-multiboot $(TARGET)
@@ -148,6 +150,4 @@ $(OBJ)/kernel.o : $(SRC)/kernel.c
 	@printf "\n"
 
 clean:
-	rm -f $(OBJ)/*.o
-	rm -f $(ASM_OBJ)/*.o
-	rm -rf $(OUT)/*
+	rm -rf $(OBJ) $(OUT)

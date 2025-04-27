@@ -214,6 +214,9 @@ void kmain() {
         } else if(strcmp(command, "echo") == 0) {
             printf("%s\n", args);
         } else if(strcmp(command, "waver") == 0) {
+            printf("Warning, this will lock your system\n");
+            printf("Press ESC to exit\n");
+            printf(">draw_wave()\n");
             draw_wave();
         } else if(strcmp(command, "color") == 0) {
             print_available_colors();
