@@ -1,5 +1,4 @@
 #include "keyboard.h"
-
 #include "console.h"
 #include "idt.h"
 #include "io_ports.h"
@@ -7,9 +6,15 @@
 #include "types.h"
 #include "string.h"
 
+#define INPUT_BUFFER_SIZE 256  // Adjust as needed
+
 static BOOL g_caps_lock = FALSE;
 static BOOL g_shift_pressed = FALSE;
 char g_ch = 0, g_scan_code = 0;
+
+// Input buffer and position tracking
+static char g_input_buffer[INPUT_BUFFER_SIZE];
+static int g_input_pos = 0;
 
 // see scan codes defined in keyboard.h for index
 char g_scan_code_chars[128] = {
@@ -20,7 +25,6 @@ char g_scan_code_chars[128] = {
     0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, '-', 0, 0, 0, '+', 0, 0,
     0, 0, 0, 0, 0, 0, 0, 0, 0
 };
-
 
 static int get_scancode() {
     int i, scancode = 0;
@@ -71,20 +75,25 @@ void keyboard_handler(REGISTERS *r) {
     g_ch = 0;
     scancode = get_scancode();
     g_scan_code = scancode;
+    
     if (scancode & 0x80) {
         // key release
+        switch(scancode & 0x7F) {
+            case SCAN_CODE_KEY_LEFT_SHIFT:
+                g_shift_pressed = FALSE;
+                break;
+        }
     } else {
         // key down
         switch(scancode) {
             case SCAN_CODE_KEY_CAPS_LOCK:
-                if (g_caps_lock == FALSE)
-                    g_caps_lock = TRUE;
-                else
-                    g_caps_lock = FALSE;
+                g_caps_lock = !g_caps_lock;
                 break;
 
             case SCAN_CODE_KEY_ENTER:
                 g_ch = '\n';
+                g_input_buffer[g_input_pos] = '\0'; // Null-terminate the string
+                g_input_pos = 0; // Reset position for next input
                 break;
 
             case SCAN_CODE_KEY_TAB:
@@ -95,26 +104,42 @@ void keyboard_handler(REGISTERS *r) {
                 g_shift_pressed = TRUE;
                 break;
 
+            case SCAN_CODE_KEY_BACKSPACE:
+                if (g_input_pos > 0) {
+                    g_input_pos--;
+                    g_input_buffer[g_input_pos] = '\0';
+                    console_backspace();
+                }
+                break;
+
             default:
                 g_ch = g_scan_code_chars[scancode];
-                // if caps in on, covert to upper
-                if (g_caps_lock) {
-                    // if shift is pressed before
-                    if (g_shift_pressed) {
-                        // replace alternate chars
-                        g_ch = alternate_chars(g_ch);
-                    } else
-                        g_ch = upper(g_ch);
-                } else {
-                    if (g_shift_pressed) {
-                        if (isalpha(g_ch))
-                            g_ch = upper(g_ch);
-                        else 
+                if (g_ch) {
+                    // if caps is on, convert to upper
+                    if (g_caps_lock) {
+                        // if shift is pressed before
+                        if (g_shift_pressed) {
                             // replace alternate chars
-                        g_ch = alternate_chars(g_ch);
-                    } else
-                        g_ch = g_scan_code_chars[scancode];
-                    g_shift_pressed = FALSE;
+                            g_ch = alternate_chars(g_ch);
+                        } else {
+                            g_ch = upper(g_ch);
+                        }
+                    } else {
+                        if (g_shift_pressed) {
+                            if (isalpha(g_ch)) {
+                                g_ch = upper(g_ch);
+                            } else {
+                                // replace alternate chars
+                                g_ch = alternate_chars(g_ch);
+                            }
+                        }
+                    }
+                    
+                    // Only add to buffer if there's space and it's a printable character
+                    if (g_input_pos < INPUT_BUFFER_SIZE - 1 && g_ch >= ' ') {
+                        g_input_buffer[g_input_pos] = g_ch;
+                        g_input_pos++;
+                    }
                 }
                 break;
         }
@@ -122,6 +147,8 @@ void keyboard_handler(REGISTERS *r) {
 }
 
 void keyboard_init() {
+    memset(g_input_buffer, 0, INPUT_BUFFER_SIZE);
+    g_input_pos = 0;
     isr_register_interrupt_handler(IRQ_BASE + 1, keyboard_handler);
 }
 
@@ -169,5 +196,7 @@ char keyboard_read() {
     return c;
 }
 
-
-
+// Get the current input buffer (for command processing)
+const char* kb_get_input_buffer() {
+    return g_input_buffer;
+}

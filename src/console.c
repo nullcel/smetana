@@ -4,6 +4,7 @@
 #include "vga.h"
 #include "keyboard.h"
 
+// Add this function declaration
 static uint16 *g_vga_buffer;
 //index for video buffer array
 static uint32 g_vga_index;

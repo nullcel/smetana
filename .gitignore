@@ -1,4 +1,7 @@
 *.iso
+*.bin
+*.img
+
 
 # Prerequisites
 *.d
